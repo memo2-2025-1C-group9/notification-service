@@ -1,11 +1,48 @@
-version: '3.8'
-
 services:
-  app:
+  notification-service:
     build: .
+    command: ["/app/entrypoint.sh", "app"]
     ports:
       - "8080:8080"
+    profiles:
+      - app
+    depends_on:
+      - rabbitmq
     volumes:
       - .:/app
+    environment:
+      - ENVIRONMENT=development
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=require
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE}
     env_file:
       - .env.development
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  notification-service-test:
+    build: .
+    command: ["/app/entrypoint.sh", "test"]
+    environment:
+      - ENVIRONMENT=test
+    volumes:
+      - .:/app
+    profiles:
+      - test
+    env_file:
+      - .env.development
+
+volumes:
+  rabbitmq_data:

@@ -7,3 +7,7 @@ httpx
 pytest-asyncio
 secure-smtplib
 pydantic-settings
+pika
+sqlalchemy
+psycopg2-binary
+pydantic[email]

@@ -15,10 +15,25 @@ class Settings(BaseSettings):
     HOST: str
     PORT: int
 
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_HOST: str
+    DB_PORT: int
+    DB_NAME: str
+    PGSSLMODE: str = "require"
+
+    @property
+    def DATABASE_URL(self) -> str:
+        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?sslmode={self.PGSSLMODE}"
+
     SMTP_HOST: str
     SMTP_PORT: int
     FROM_EMAIL: str
     APP_PASSWORD: str
+
+    # RabbitMQ
+    RABBITMQ_HOST: str = "rabbitmq"
+    RABBITMQ_QUEUE: str
 
 
 try:
