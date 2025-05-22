@@ -29,10 +29,10 @@ import logging
 
 
 def callback(ch, method, properties, body):
-    logging.info(f"Received message: {body}")  # Mandar a procesar el mensaje
-
-    process_message(body)
-
+    try:
+        process_message(body)
+    except Exception as e:
+        logging.error(f"Error al procesar el mensaje: {str(e)}")
 
 def worker_main():
     for i in range(10):

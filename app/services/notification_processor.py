@@ -9,39 +9,60 @@
 from app.schemas.queue_message import NotificationMessage
 from app.repositories.user_repository import get_user_by_id, create_user
 from app.services.email_notification import send_email
+from app.db.session import SessionLocal
+import json
+import logging
 
-
-def process_message(message: NotificationMessage):
+def process_message(bytes_message):
     """
     Process the incoming message from RabbitMQ.
     """
-    # Parsear el mensaje, llega como bytes
+    db = None
+    try:
+        db = SessionLocal()
+        # Parsear el mensaje, llega de la queue como bytes
+        json_str = bytes_message.decode("utf-8")
+        data_dict = json.loads(json_str)
+        message = NotificationMessage(**data_dict)
 
-    user_id = message.id_user
+        logging.info(f"Procesando mensaje: {message}")
 
-    user = get_user_by_id(user_id)
-    if not user:  # Usuario no registrado, crearlo con valores default
-        create_user(user_id)
+        user_id = message.id_user
 
-    # Existe el user, enviar notificaciones
+        user = get_user_by_id(db, user_id)
+        if not user:  # Usuario no registrado, crearlo con valores default
+            logging.info(f"Usuario no registrado, creando usuario con ID: {user_id}")
+            create_user(db, user_id)
 
-    # Armar el mensaje segun el tipo de notificacion
-    subject, body = "Titulo de ejemplo para envio de notificaciones", {
-        "datos": 1
-    }  # funcion que arma el mensaje
+        # Existe el user, enviar notificaciones
 
-    # TODO: Despues sacar estos if's horribles
-    if user.tarea_email:
-        send_email(user.email, subject, body)
-        # Enviar notificacion de tarea por email
-        pass
-    if user.tarea_push:
-        # Enviar notificacion de tarea por push
-        pass
-    if user.examen_email:
-        send_email(user.email, subject, body)
-        # Enviar notificacion de examen por email
-        pass
-    if user.examen_push:
-        # Enviar notificacion de examen por push
-        pass
+        # Armar el mensaje segun el tipo de notificacion
+        subject, body = "Titulo de ejemplo para envio de notificaciones", {
+            "datos": 1
+        }  # funcion que arma el mensaje
+        body_str = json.dumps(body) # Cuando arme el mensaje, mandarlo como string
+
+        # TODO: Despues sacar estos if's horribles y filtrar por el tipo de notificacion
+        if user.tarea_email:
+            send_email(message.email, subject, body_str)
+            # Enviar notificacion de tarea por email
+            pass
+        if user.tarea_push:
+            # Enviar notificacion de tarea por push
+            pass
+        if user.examen_email:
+            # send_email(message.email, subject, body_str)
+            # Enviar notificacion de examen por email
+            pass
+        if user.examen_push:
+            # Enviar notificacion de examen por push
+            pass
+    except Exception as e:
+        logging.error(f"Error al procesar el mensaje: {str(e)}")
+        raise
+    finally:
+        if db:
+            try:
+                db.close()
+            except Exception as e:
+                logging.error(f"Error al cerrar conexión DB: {str(e)}")
