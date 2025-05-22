@@ -47,7 +47,9 @@ def worker_main():
             logging.error(f"Error al conectar a RabbitMQ {1+i}/10")
             if i == 9:
                 raise
-            time.sleep(2) # En el docker compose tarda un poco en levantar el servicio de RabbitMQ
+            time.sleep(
+                2
+            )  # En el docker compose tarda un poco en levantar el servicio de RabbitMQ
 
     channel = connection.channel()
 
@@ -59,4 +61,3 @@ def worker_main():
 
     logging.info(f"Waiting for messages. Queue: {settings.RABBITMQ_QUEUE}")
     channel.start_consuming()
-

@@ -27,6 +27,7 @@ except Exception as e:
     logging.error(f"Error starting worker thread: {str(e)}")
     logging.error(traceback.format_exc())
 
+
 @app.get("/health")
 def get_health():
     return {"status": "ok"}
