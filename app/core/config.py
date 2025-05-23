@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     RABBITMQ_HOST: str = "rabbitmq"
     RABBITMQ_QUEUE: str
 
+    AUTH_SERVICE_URL: str
+
 
 try:
     settings = Settings()

@@ -6,13 +6,14 @@
 #            El email y tokenFMC del usuario (El token lo voy a tener en la base de datos)
 #            Y las preferencias del usuario en cuanto a que tipo de notificaciones quiere recibir segun el evento
 
-from app.schemas.queue_message import NotificationMessage
+from app.schemas.notification_schemas import NotificationMessage
 from app.repositories.user_repository import get_user_by_id, create_user
 from app.services.email_notification import send_email
 from app.utils.notification_formatter import format_notification
 from app.db.session import SessionLocal
 import json
 import logging
+
 
 def process_message(bytes_message):
     """
@@ -38,10 +39,8 @@ def process_message(bytes_message):
         # Existe el user, enviar notificaciones
 
         # Armar el mensaje segun el tipo de notificacion
-        subject, body = format_notification( # TODO: Funcion a chequear
-            message.notification_type,
-            message.event,
-            message.data
+        subject, body = format_notification(  # TODO: Funcion a chequear
+            message.notification_type, message.event, message.data
         )
 
         # TODO: Despues sacar estos if's horribles
@@ -50,7 +49,7 @@ def process_message(bytes_message):
             if user.examen_email:
                 # Enviar notificacion de examen por email
                 send_email(message.email, subject, body)
-                
+
             if user.examen_push:
                 # Enviar notificacion de examen por push
                 pass
@@ -64,7 +63,7 @@ def process_message(bytes_message):
             if user.tarea_push:
                 # Enviar notificacion de tarea por push
                 pass
-        
+
     except Exception as e:
         logging.error(f"Error al procesar el mensaje: {str(e)}")
         raise

@@ -6,6 +6,7 @@ from app.db.session import engine
 import logging
 import traceback
 from app.workers.notification_worker import worker_main
+from app.routers.notification_router import router as notification_router
 
 app = FastAPI()
 
@@ -26,6 +27,11 @@ try:
 except Exception as e:
     logging.error(f"Error starting worker thread: {str(e)}")
     logging.error(traceback.format_exc())
+
+
+# TODO: Errores con RFC
+
+app.include_router(notification_router)
 
 
 @app.get("/health")

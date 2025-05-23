@@ -17,3 +17,10 @@ class NotificationMessage(BaseModel):
     notification_type: Literal["Examen", "Tarea"]
     event: Literal["Nuevo", "Actualizado", "Entregado", "Calificado"]
     data: Dict[str, Any]
+
+
+class UserPreferences(BaseModel):
+    examen_email: bool | None = None
+    examen_push: bool | None = None
+    tarea_email: bool | None = None
+    tarea_push: bool | None = None

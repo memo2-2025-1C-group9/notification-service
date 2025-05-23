@@ -34,6 +34,7 @@ def callback(ch, method, properties, body):
     except Exception as e:
         logging.error(f"Error al procesar el mensaje: {str(e)}")
 
+
 def worker_main():
     for i in range(10):
         try:
