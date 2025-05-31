@@ -22,9 +22,9 @@
 #  "Calificado" : {titulo, nota, feedback, fecha, hora} Avisa que se califico la entrega
 
 import time
-import pika
 from app.services.notification_processor import process_message
 from app.core.config import settings
+from app.repositories.queue_repository import QueueRepository
 import logging
 
 
@@ -36,12 +36,11 @@ def callback(ch, method, properties, body):
 
 
 def worker_main():
+    logging.info("Iniciando worker para procesar notificaciones")
     for i in range(10):
         try:
             logging.info(f"Intentando conectar a RabbitMQ {1+i}/10")
-            connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=settings.RABBITMQ_HOST)
-            )
+            queue_repo = QueueRepository()
             logging.info(f"Conexion a RabbitMQ exitosa")
             break
         except Exception:
@@ -49,16 +48,14 @@ def worker_main():
             if i == 9:
                 raise
             time.sleep(
-                2
+                3
             )  # En el docker compose tarda un poco en levantar el servicio de RabbitMQ
 
-    channel = connection.channel()
-
-    channel.queue_declare(queue=settings.RABBITMQ_QUEUE)
+    logging.info("Conectado a RabbitMQ, escuchando mensajes en la queue")
+    channel = queue_repo._channel
 
     channel.basic_consume(
         queue=settings.RABBITMQ_QUEUE, on_message_callback=callback, auto_ack=True
     )
 
-    logging.info(f"Waiting for messages. Queue: {settings.RABBITMQ_QUEUE}")
     channel.start_consuming()

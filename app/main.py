@@ -11,6 +11,7 @@ from app.routers.notification_router import router as notification_router
 app = FastAPI()
 
 logging.getLogger("pika").setLevel(logging.INFO)
+logging.getLogger("httpcore").setLevel(logging.INFO)
 
 # Crear todas las tablas al iniciar la aplicación
 try:
