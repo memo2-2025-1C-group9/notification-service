@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from fastapi import HTTPException, status
 import pika
 from app.core.config import settings
 import logging
@@ -43,7 +44,10 @@ class QueueRepository:
 
         except Exception as e:
             logging.error(f"Error al enviar mensaje a RabbitMQ: {str(e)}")
-            return False
+            raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+            )
 
     def close(self):
         if self._connection and not self._connection.is_closed:
