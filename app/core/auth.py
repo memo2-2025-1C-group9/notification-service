@@ -5,6 +5,7 @@ from typing import Optional
 from functools import lru_cache
 from dotenv import load_dotenv
 from app.core.config import settings
+
 logger = logging.getLogger(__name__)
 
 load_dotenv()

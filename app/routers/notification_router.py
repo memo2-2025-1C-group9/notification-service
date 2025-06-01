@@ -95,7 +95,7 @@ async def create_user_notification(
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
     try:
-        await handle_validate_user(token) 
+        await handle_validate_user(token)
 
         # retorna true, ver que retornar (un success true con status 200?)
         return handle_add_queue_message(notification)

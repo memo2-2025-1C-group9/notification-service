@@ -11,7 +11,9 @@ async def get_course_users(course_id: str):
     # Llamar al auth service para validar el token
     async with httpx.AsyncClient() as client:
         try:
-            logging.info(f"Obteniendo usuarios del curso {course_id} desde {settings.COURSES_SERVICE_URL}/courses/{course_id}")
+            logging.info(
+                f"Obteniendo usuarios del curso {course_id} desde {settings.COURSES_SERVICE_URL}/courses/{course_id}"
+            )
 
             response = await client.get(
                 f"{settings.COURSES_SERVICE_URL}/courses/{course_id}",
@@ -31,4 +33,3 @@ async def get_course_users(course_id: str):
                 status_code=500,
                 detail="Error al conectar con el servicio de usuarios",
             )
-

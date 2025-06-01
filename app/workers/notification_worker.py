@@ -30,9 +30,8 @@ from app.repositories.queue_repository import QueueRepository
 import logging
 
 
-
 def callback(ch, method, properties, body):
-    loop = asyncio.new_event_loop() # pika usa callbacks sincronos.
+    loop = asyncio.new_event_loop()  # pika usa callbacks sincronos.
     asyncio.set_event_loop(loop)
     try:
         loop.run_until_complete(process_message(body))

@@ -72,6 +72,7 @@ def edit_user(db: Session, user_id: int, preferences: UserPreferences):
             status_code=500, detail=f"Error al editar preferencias de usuario: {str(e)}"
         )
 
+
 async def get_info_user(user_id: int, retry: bool = True):
     """
     Obtiene la información del usuario.
@@ -99,8 +100,8 @@ async def get_info_user(user_id: int, retry: bool = True):
                     detail=f"Error al obtener informacion del usuario (ID {user_id})",
                 )
     except HTTPException as e:
-        raise e        
-    
+        raise e
+
     except httpx.RequestError as e:
         logging.error(f"Error al conectar con el servicio de usuarios: {str(e)}")
         raise HTTPException(
