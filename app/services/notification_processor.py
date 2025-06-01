@@ -88,14 +88,11 @@ def process_user_notification(notification: UserNotificationEvent):
 
 
 async def process_course_notification(notification: CourseNotificationEvent):
-    db = None
     try:
         # Obtener todos los usuarios del curso
         logging.info(
             f"Procesando notificación de curso: {notification.id_course}, tipo: {notification.notification_type}, evento: {notification.event}"
         )
-
-        db = SessionLocal()
 
         user_list = await get_course_users(notification.id_course)
 
