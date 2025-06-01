@@ -95,13 +95,9 @@ async def create_user_notification(
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
     try:
-        user_id = await handle_validate_user(token)
-        if not user_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Credenciales de autenticación inválidas",
-            )
+        await handle_validate_user(token) 
 
+        # retorna true, ver que retornar (un success true con status 200?)
         return handle_add_queue_message(notification)
 
     except HTTPException:
@@ -125,13 +121,9 @@ async def create_course_notification(
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
     try:
-        user_id = await handle_validate_user(token)
-        if not user_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Credenciales de autenticación inválidas",
-            )
+        await handle_validate_user(token)
 
+        # retorna true, ver que retornar
         return handle_add_queue_message(notification)
 
     except HTTPException:

@@ -3,6 +3,7 @@ from app.core.config import settings
 from sqlalchemy.orm import Session
 from app.schemas.notification_schemas import UserPreferences
 from app.repositories.user_repository import get_user_by_id, create_user, update_user
+from app.core.auth import get_service_auth
 import httpx
 import logging
 
@@ -26,7 +27,10 @@ async def validate_user(token: str):
                 user_data = response.json()
                 user_id = user_data.get("id")
                 return user_id
-            return None
+            raise HTTPException(
+                status_code=response.status_code,
+                detail="Token inválido o expirado",
+            )
 
         except httpx.RequestError as e:
             logging.error(f"Error al conectar con el servicio de usuarios: {str(e)}")
@@ -66,4 +70,39 @@ def edit_user(db: Session, user_id: int, preferences: UserPreferences):
         db.rollback()
         raise HTTPException(
             status_code=500, detail=f"Error al editar preferencias de usuario: {str(e)}"
+        )
+
+async def get_info_user(user_id: int, retry: bool = True):
+    """
+    Obtiene la información del usuario.
+    """
+    try:
+        auth_service = get_service_auth()
+        access_token = auth_service.get_token()
+
+        logging.info(f"Obteniendo información del usuario con id: {user_id}...")
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{settings.AUTH_SERVICE_URL}/user/{user_id}",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            if response.status_code == 200:
+                user_data = response.json()
+                return user_data
+            else:
+                if response.status_code == 401 and retry:
+                    logging.warning("Token expirado o inválido, intentando renovar...")
+                    await auth_service.login()
+                    return await get_info_user(user_id, retry=False)
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"Error al obtener informacion del usuario (ID {user_id})",
+                )
+    except HTTPException as e:
+        raise e        
+    
+    except httpx.RequestError as e:
+        logging.error(f"Error al conectar con el servicio de usuarios: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail="Error al conectar con el servicio de usuarios"
         )

@@ -45,8 +45,8 @@ class QueueRepository:
         except Exception as e:
             logging.error(f"Error al enviar mensaje a RabbitMQ: {str(e)}")
             raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error interno del servidor",
             )
 
     def close(self):

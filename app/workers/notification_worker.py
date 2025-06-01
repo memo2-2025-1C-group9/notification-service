@@ -21,6 +21,8 @@
 #  "Entregado" : {titulo, fecha, hora} Avisa que se recibio la entrega # Esto es relevante?
 #  "Calificado" : {titulo, nota, feedback, fecha, hora} Avisa que se califico la entrega
 
+import asyncio
+import functools
 import time
 from app.services.notification_processor import process_message
 from app.core.config import settings
@@ -28,11 +30,14 @@ from app.repositories.queue_repository import QueueRepository
 import logging
 
 
+
 def callback(ch, method, properties, body):
+    loop = asyncio.new_event_loop() # pika usa callbacks sincronos.
+    asyncio.set_event_loop(loop)
     try:
-        process_message(body)
-    except Exception as e:
-        logging.error(f"Error al procesar el mensaje: {str(e)}")
+        loop.run_until_complete(process_message(body))
+    finally:
+        loop.close()
 
 
 def worker_main():

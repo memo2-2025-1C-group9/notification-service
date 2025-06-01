@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     RABBITMQ_QUEUE: str
 
     AUTH_SERVICE_URL: str
+    COURSES_SERVICE_URL: str
+
+    SERVICE_USERNAME: str
+    SERVICE_PASSWORD: str
 
 
 try:

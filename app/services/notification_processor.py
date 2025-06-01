@@ -6,41 +6,41 @@
 #            El email y tokenFMC del usuario (El token lo voy a tener en la base de datos)
 #            Y las preferencias del usuario en cuanto a que tipo de notificaciones quiere recibir segun el evento
 
+from fastapi import HTTPException
 from app.schemas.notification_schemas import (
     UserNotificationEvent,
     CourseNotificationEvent,
 )
+from app.schemas.user_schema import UserInfo
 from app.repositories.user_repository import get_user_by_id, create_user
+from app.services.courses_service import get_course_users
 from app.services.email_notification import send_email
+from app.services.user_service import get_info_user
 from app.utils.notification_formatter import format_notification
 from app.db.session import SessionLocal
 import json
 import logging
 
 
-def process_message(body: bytes):
+async def process_message(body: bytes):
     try:
         # Decodificar el mensaje de bytes a string
         message_str = body.decode("utf-8")
         message_dict = json.loads(message_str)
-
         # Determinar el tipo de mensaje basado en las claves presentes
         if "id_user" in message_dict:
             notification = UserNotificationEvent(**message_dict)
             process_user_notification(notification)
         elif "id_course" in message_dict:
             notification = CourseNotificationEvent(**message_dict)
-            # process_course_notification(notification)
+            await process_course_notification(notification)
         else:  # No deberia entrar nunca aca, se valida el formato con el endpoint de la API
             logging.error(f"Mensaje con formato inválido: {message_dict}")
-            raise ValueError("Formato de mensaje no reconocido")
 
     except json.JSONDecodeError as e:
         logging.error(f"Error al decodificar el mensaje JSON: {str(e)}")
-        raise
     except Exception as e:
         logging.error(f"Error al procesar el mensaje: {str(e)}")
-        raise
 
 
 def process_user_notification(notification: UserNotificationEvent):
@@ -59,7 +59,7 @@ def process_user_notification(notification: UserNotificationEvent):
             logging.info(f"Usuario no registrado, creando usuario con ID: {user_id}")
             user = create_user(db, user_id)
 
-        # subject, body = format_notification(  # TODO: Funcion a chequear
+        # subject, body = format_notification(  # TODO: Funcion a chequear, tengo que armar el mensaje segun lo que me llega, cada tipo deberia traer info distinta
         #    notification.notification_type, notification.event, notification.data
         # )
         # Procesar según el tipo de evento
@@ -67,45 +67,74 @@ def process_user_notification(notification: UserNotificationEvent):
             logging.info(
                 f"Procesando notificación de {notification.notification_type} EMAIL para usuario {notification.id_user}"
             )
-            # send_email(notification.email, subject, body)
+            subject = f"{notification.notification_type} - {notification.event}"  # TODO: Esto es provisional, armar el mensaje con la funcion de format_notification
+            body = f"{notification.notification_type} - {notification.event}\n{notification.data}"  # TODO: Esto es provisional, armar el mensaje con la funcion de format_notification
+            send_email(notification.email, subject, body)
 
         if should_notify(user, notification.notification_type, "push"):
-            # TODO: Implementar lógica para notificación de calificación
+            # TODO: Implementar lógica para notificación push
             logging.info(
                 f"Procesando notificación de {notification.notification_type} PUSH para usuario {notification.id_user}"
             )
 
     except Exception as e:
         logging.error(f"Error al procesar notificación de usuario: {str(e)}")
-        raise
+        raise HTTPException(
+            status_code=500, detail=f"Error al procesar notificación de usuario"
+        )
 
 
-"""
-def process_course_notification(notification: CourseNotificationEvent):
+
+async def process_course_notification(notification: CourseNotificationEvent):
+    db = None
     try:
         # Obtener todos los usuarios del curso
+        logging.info(
+            f"Procesando notificación de curso: {notification.id_course}, tipo: {notification.notification_type}, evento: {notification.event}"
+        )
 
-        # TODO: Implementar lógica para obtener usuarios del curso, comunicarse con el otro servicio
-        # y para cada usuario que puedo obtener la info mando la notificacion con el process user? o armo otra fn?
-        # user = obtenerlo pidiendolo al servicio de cursos segun el id de course
+        db = SessionLocal()
 
-        # Procesar según el tipo de evento
-        if should_notify(user, notification.notification_type, "email"):
-            logging.info(
-                f"Procesando notificación de entrega para usuario {notification.id_user}"
-            )
-            send_email(notification.email, subject, body)
+        user_list = await get_course_users(notification.id_course)
 
-        if should_notify(user, notification.notification_type, "push"):
-            # TODO: Implementar lógica para notificación de calificación
-            logging.info(
-                f"Procesando notificación de calificación para usuario {notification.id_user}"
-            )
+        for user_id in user_list:
+            try:
+                user_data_info = await get_info_user(user_id)
+                user_info = UserInfo(**user_data_info)
+            except Exception:
+                logging.error(f"Error al obtener información del usuario {user_id}")
+                continue
+            logging.info(f"Usuario obtenido: {user_info}")
+
+            # Obtener las preferencias del usuario
+            user = get_user_by_id(db, user_id)
+            if not user:  # Usuario no registrado, crearlo con valores default
+                logging.info(f"Usuario no registrado, creando usuario con ID: {user_id}")
+                user = create_user(db, user_id)
+
+            # Procesar según el tipo de evento
+            if should_notify(user, notification.notification_type, "email"):
+                logging.info(
+                    f"Procesando notificación de entrega para usuario {user_id}"
+                )
+                subject = f"{notification.notification_type} - {notification.event}"  # TODO: Esto es provisional, armar el mensaje con la funcion de format_notification
+                body = f"{notification.notification_type} - {notification.event}\n{notification.data}"  # TODO: Esto es provisional, armar el mensaje con la funcion de format_notification
+                send_email(user_info.email, subject, body)
+
+            if should_notify(user, notification.notification_type, "push"):
+                # TODO: Implementar lógica para notificación de calificación
+                logging.info(
+                    f"Procesando notificación de calificación para usuario {user_id}"
+                )
+    except HTTPException:
+        raise
 
     except Exception as e:
         logging.error(f"Error al procesar notificación de curso: {str(e)}")
-        raise
-"""
+        raise HTTPException(
+            status_code=500, detail=f"Error al procesar notificación de curso"
+        )
+
 
 
 def should_notify(user, notification_type: str, method: str) -> bool:
