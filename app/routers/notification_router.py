@@ -94,11 +94,23 @@ async def create_user_notification(
     notification: UserNotificationEvent,
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
+    """
+    Crea una notificación de usuario y la agrega a la cola de mensajes.
+    """
     try:
         await handle_validate_user(token)
 
         # retorna true, ver que retornar (un success true con status 200?)
-        return handle_add_queue_message(notification)
+        if handle_add_queue_message(notification):
+            return {
+                "success": True,
+                "message": "Mensaje agregado a la cola correctamente.",
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error al agregar mensaje a la cola",
+            )
 
     except HTTPException:
         raise
@@ -120,11 +132,23 @@ async def create_course_notification(
     notification: CourseNotificationEvent,
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
+    """
+    Crea una notificación de curso y la agrega a la cola de mensajes.
+    """
     try:
         await handle_validate_user(token)
 
         # retorna true, ver que retornar
-        return handle_add_queue_message(notification)
+        if handle_add_queue_message(notification):
+            return {
+                "success": True,
+                "message": "Mensaje agregado a la cola correctamente.",
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error al agregar mensaje a la cola",
+            )
 
     except HTTPException:
         raise

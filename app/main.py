@@ -78,6 +78,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         headers=headers,
     )
 
+
 app.include_router(notification_router)
 
 
