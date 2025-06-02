@@ -17,9 +17,8 @@ class QueueRepository:
 
     def _connect(self):
         try:
-            self._connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=settings.RABBITMQ_HOST)
-            )
+            params = pika.URLParameters(settings.RABBITMQ_HOST)
+            self._connection = pika.BlockingConnection(params)
             self._channel = self._connection.channel()
             self._channel.queue_declare(queue=settings.RABBITMQ_QUEUE, durable=True)
             logging.info("Conexión a RabbitMQ establecida correctamente")
