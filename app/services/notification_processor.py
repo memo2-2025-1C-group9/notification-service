@@ -94,13 +94,16 @@ async def process_course_notification(notification: CourseNotificationEvent):
             f"Procesando notificación de curso: {notification.id_course}, tipo: {notification.notification_type}, evento: {notification.event}"
         )
 
-        user_list = await get_course_users(notification.id_course) # Ojo aca puede devolver none si el request no fue code:200
+        user_list = await get_course_users(
+            notification.id_course
+        )  # Ojo aca puede devolver none si el request no fue code:200
         if not user_list:
             logging.warning(
                 f"No se encontraron usuarios para el curso {notification.id_course}"
             )
             raise HTTPException(
-            status_code=500, detail=f"Error al obtener informacion del curso: {notification.id_course}"
+                status_code=500,
+                detail=f"Error al obtener informacion del curso: {notification.id_course}",
             )
 
         for user_id in user_list:

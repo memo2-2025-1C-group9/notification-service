@@ -2,9 +2,10 @@
 
 from typing import Tuple, Dict, Callable
 from app.schemas.notification_schemas import NotificationEventData
+
 # TODO: Toda esta data y formatos de mensajes anotarlo en el README
 
-# Desde el assessment recibo:    
+# Desde el assessment recibo:
 """
 Esto me llega para Examen/Tarea Nuevo/Actualizado
 payload = {
@@ -19,6 +20,7 @@ payload = {
     },
 }
 """
+
 
 def format_nuevo(data: NotificationEventData):
     return (
