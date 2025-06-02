@@ -115,8 +115,10 @@ async def process_course_notification(notification: CourseNotificationEvent):
             # Obtener las preferencias del usuario
             user = get_user_preferences(user_id)
 
-            subject = f"{notification.notification_type} - {notification.event}"  # TODO: Esto es provisional, armar el mensaje con la funcion de format_notification
-            body = f"{notification.notification_type} - {notification.event}\n{notification.data}"  # TODO: Esto es provisional, armar el mensaje con la funcion de format_notification
+            subject, body = format_notification(
+                notification.notification_type, notification.event, notification.data
+            )
+
             send_notifications(
                 user, user_id, user_info.email, notification, subject, body
             )

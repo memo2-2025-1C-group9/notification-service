@@ -15,11 +15,11 @@ def send_email(to_email: str, subject: str, body: str):
 
     # Enviar el correo
     try:
-        # server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT)
-        # server.starttls()  # Iniciar TLS
-        # server.login(settings.FROM_EMAIL, settings.APP_PASSWORD)
-        # server.send_message(msg)
-        # server.quit()
+        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT)
+        server.starttls()  # Iniciar TLS
+        server.login(settings.FROM_EMAIL, settings.APP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
 
         logging.info(
             f"Correo enviado a {to_email} con éxito. Asunto: {subject}. Cuerpo: {body}"
