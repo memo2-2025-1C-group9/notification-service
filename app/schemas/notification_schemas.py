@@ -30,7 +30,7 @@ class NotificationEventData(BaseModel):
 
 class UserNotificationEvent(BaseModel):
     id_user: int
-    email: EmailStr
+    # email: EmailStr no se recibe el email
     notification_type: Literal["Examen", "Tarea"]
     event: Literal["Entregado", "Calificado"]
     data: NotificationEventData

@@ -45,7 +45,7 @@ async def process_message(body: bytes):
         # Determinar el tipo de mensaje basado en las claves presentes
         if "id_user" in message_dict:
             notification = UserNotificationEvent(**message_dict)
-            process_user_notification(notification)
+            await process_user_notification(notification)
         elif "id_course" in message_dict:
             notification = CourseNotificationEvent(**message_dict)
             await process_course_notification(notification)
@@ -58,7 +58,7 @@ async def process_message(body: bytes):
         logging.error(f"Error al procesar el mensaje: {str(e)}")
 
 
-def process_user_notification(notification: UserNotificationEvent):
+async def process_user_notification(notification: UserNotificationEvent):
     try:
         logging.info(
             f"Procesando notificación de usuario: {notification.id_user}, tipo: {notification.notification_type}, evento: {notification.event}"
@@ -69,16 +69,22 @@ def process_user_notification(notification: UserNotificationEvent):
         # Obtener las preferencias del usuario
         user = get_user_preferences(user_id)
 
-        # subject, body = format_notification(  # TODO: Funcion a chequear, tengo que armar el mensaje segun lo que me llega, cada tipo deberia traer info distinta
-        #    notification.notification_type, notification.event, notification.data
-        # )
-        # Procesar según el tipo de evento
-
-        subject = f"{notification.notification_type} - {notification.event}"  # TODO: Esto es provisional, armar el mensaje con la funcion de format_notification
-        body = f"{notification.notification_type} - {notification.event}\n{notification.data}"  # TODO: Esto es provisional, armar el mensaje con la funcion de format_notification
-        send_notifications(
-            user, user_id, notification.email, notification, subject, body
+        # Buscar usuario por id para el email, no lo recibo desde assessments
+        try:
+            user_data_info = await get_info_user(user_id)
+            user_info = UserInfo(**user_data_info)
+        except Exception:
+            logging.error(f"Error al obtener información del usuario {user_id}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error al obtener información del usuario: {user_id}",
+            )
+        logging.info(f"Usuario obtenido: {user_info}")
+        subject, body = format_notification(
+            notification.notification_type, notification.event, notification.data
         )
+
+        send_notifications(user, user_id, user_info.email, notification, subject, body)
 
     except Exception as e:
         logging.error(f"Error al procesar notificación de usuario: {str(e)}")
@@ -94,9 +100,7 @@ async def process_course_notification(notification: CourseNotificationEvent):
             f"Procesando notificación de curso: {notification.id_course}, tipo: {notification.notification_type}, evento: {notification.event}"
         )
 
-        user_list = await get_course_users(
-            notification.id_course
-        )  # Ojo aca puede devolver none si el request no fue code:200
+        user_list = await get_course_users(notification.id_course)
         if not user_list:
             logging.warning(
                 f"No se encontraron usuarios para el curso {notification.id_course}"

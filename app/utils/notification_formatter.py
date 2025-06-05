@@ -19,6 +19,19 @@ payload = {
         "instrucciones": task_result.instructions,
     },
 }
+Entrega/Calificacion
+{
+        "id_user": task_result.student_id,
+        "notification_type": "Tarea",
+        "event": event,
+        "data": {
+            "titulo": task_result.task_id,
+            "feedback": task_result.feedback,
+            "fecha": task_result.submitted_at.isoformat(),
+            "nota": task_result.grade
+        }
+    }
+
 """
 
 
@@ -39,14 +52,14 @@ def format_actualizado(data: NotificationEventData):
 def format_entregado(data: NotificationEventData):
     return (
         f"Entrega recibida: {data.titulo}",
-        f"Tu entrega fue recibida el {data.fecha} a las {data.hora}.",
+        f"Tu entrega fue recibida el {data.fecha}.",
     )
 
 
 def format_calificado(data: NotificationEventData):
     return (
         f"{data.titulo} calificado",
-        f"Nota: {data.nota}\nComentarios: {data.feedback}\nFecha: {data.fecha} a las {data.hora}",
+        f"Nota: {data.nota}\nComentarios: {data.feedback}\nFecha: {data.fecha}",
     )
 
 
