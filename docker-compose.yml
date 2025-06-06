@@ -6,8 +6,6 @@ services:
       - "8080:8080"
     profiles:
       - app
-    depends_on:
-      - rabbitmq
     volumes:
       - .:/app
     environment:
@@ -23,15 +21,6 @@ services:
     env_file:
       - .env.development
 
-  rabbitmq:
-    image: rabbitmq:4-management
-    container_name: rabbitmq
-    ports:
-      - 5672:5672
-      - 15672:15672
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-
   notification-service-test:
     build: .
     command: ["/app/entrypoint.sh", "test"]
@@ -41,8 +30,4 @@ services:
       - .:/app
     profiles:
       - test
-    env_file:
-      - .env.development
 
-volumes:
-  rabbitmq_data:
