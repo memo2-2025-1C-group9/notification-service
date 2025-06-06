@@ -55,8 +55,6 @@ async def get_user_preferences(
         )
 
 
-# Actualizar preferencias del usuario, se valida con el token
-#   Si no existe devuelvo error
 @router.put("/me/editpreferences")
 async def get_user_preferences(
     token: Annotated[str, Depends(oauth2_scheme)],
@@ -100,7 +98,6 @@ async def create_user_notification(
     try:
         await handle_validate_user(token)
 
-        # retorna true, ver que retornar (un success true con status 200?)
         if handle_add_queue_message(notification):
             return {
                 "success": True,
@@ -138,7 +135,6 @@ async def create_course_notification(
     try:
         await handle_validate_user(token)
 
-        # retorna true, ver que retornar
         if handle_add_queue_message(notification):
             return {
                 "success": True,

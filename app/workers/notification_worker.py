@@ -53,7 +53,7 @@ def worker_main():
                 raise
             time.sleep(
                 3
-            )  # En el docker compose tarda un poco en levantar el servicio de RabbitMQ
+            )
 
     logging.info("Conectado a RabbitMQ, escuchando mensajes en la queue")
     channel = queue_repo._channel

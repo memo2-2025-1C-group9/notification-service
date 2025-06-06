@@ -1,11 +1,3 @@
-# La idea es la siguiente:
-# 1. El worker va a estar escuchando en la queue
-# 2. Va a recibir el mensaje
-#       y tengo que tener la manera de saber:
-#            Que tipo de mensaje es
-#            El email y tokenFMC del usuario (El token lo voy a tener en la base de datos)
-#            Y las preferencias del usuario en cuanto a que tipo de notificaciones quiere recibir segun el evento
-
 from fastapi import HTTPException
 from app.schemas.notification_schemas import (
     UserNotificationEvent,
@@ -95,11 +87,11 @@ async def process_user_notification(notification: UserNotificationEvent):
 
 async def process_course_notification(notification: CourseNotificationEvent):
     try:
-        # Obtener todos los usuarios del curso
         logging.info(
             f"Procesando notificación de curso: {notification.id_course}, tipo: {notification.notification_type}, evento: {notification.event}"
         )
 
+        # Obtener todos los usuarios del curso
         user_list = await get_course_users(notification.id_course)
         if not user_list:
             logging.warning(

@@ -1,21 +1,5 @@
-# Estructura de mensaje
-# {
-#     "id_user": int,
-#     "email": email,
-#     "notification_type": "Examen" | "Tarea",
-#     "event": "Nuevo" | "Actualizado" | "Entregado" | "Calificado",
-#     "data": { Aca depende del evento }
-# }
-
-# {
-#     "id_course": str,
-#     "notification_type": "Examen" | "Tarea",
-#     "event": "Nuevo" | "Actualizado",
-#     "data": { Aca depende del evento }
-# }
-
-from pydantic import BaseModel, EmailStr
-from typing import Literal, Dict, Any
+from pydantic import BaseModel
+from typing import Literal
 
 
 class NotificationEventData(BaseModel):
