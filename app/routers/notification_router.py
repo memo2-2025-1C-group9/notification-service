@@ -96,7 +96,13 @@ async def create_user_notification(
     Crea una notificación de usuario y la agrega a la cola de mensajes.
     """
     try:
-        await handle_validate_user(token)
+        try:
+            await handle_validate_user(token)
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales de autenticación inválidas",
+            )
 
         if handle_add_queue_message(notification):
             return {
@@ -133,7 +139,13 @@ async def create_course_notification(
     Crea una notificación de curso y la agrega a la cola de mensajes.
     """
     try:
-        await handle_validate_user(token)
+        try:
+            await handle_validate_user(token)
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales de autenticación inválidas",
+            )
 
         if handle_add_queue_message(notification):
             return {
