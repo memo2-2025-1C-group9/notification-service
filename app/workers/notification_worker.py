@@ -51,9 +51,7 @@ def worker_main():
             logging.error(f"Error al conectar a RabbitMQ {1+i}/10")
             if i == 9:
                 raise
-            time.sleep(
-                3
-            )
+            time.sleep(3)
 
     logging.info("Conectado a RabbitMQ, escuchando mensajes en la queue")
     channel = queue_repo._channel
