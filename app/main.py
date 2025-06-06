@@ -14,29 +14,31 @@ from app.core.config import settings
 logging.getLogger("pika").setLevel(logging.INFO)
 logging.getLogger("httpcore").setLevel(logging.INFO)
 
-# Crear todas las tablas al iniciar la aplicación
-try:
-    Base.metadata.create_all(bind=engine)
-    logging.info("Tablas creadas correctamente en la base de datos")
-except Exception as e:
-    logging.error(f"Error al crear tablas en la base de datos: {str(e)}")
-    logging.error(traceback.format_exc())
+if settings.ENVIRONMENT != "test":
+    # Crear todas las tablas al iniciar la aplicación
+    try:
+        Base.metadata.create_all(bind=engine)
+        logging.info("Tablas creadas correctamente en la base de datos")
+    except Exception as e:
+        logging.error(f"Error al crear tablas en la base de datos: {str(e)}")
+        logging.error(traceback.format_exc())
 
-try:
-    thread = threading.Thread(target=worker_main, daemon=True)
-    thread.start()
-    logging.info("Worker thread started")
-except Exception as e:
-    logging.error(f"Error starting worker thread: {str(e)}")
-    logging.error(traceback.format_exc())
+    try:
+        thread = threading.Thread(target=worker_main, daemon=True)
+        thread.start()
+        logging.info("Worker thread started")
+    except Exception as e:
+        logging.error(f"Error starting worker thread: {str(e)}")
+        logging.error(traceback.format_exc())
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Inicializa los servicios necesarios al arrancar la aplicación"""
-    service_auth = get_service_auth()
-    await service_auth.initialize()
-    logging.info("Servicio de autenticación inicializado")
+    if settings.ENVIRONMENT != "test":
+        service_auth = get_service_auth()
+        await service_auth.initialize()
+        logging.info("Servicio de autenticación inicializado")
     yield
 
 
