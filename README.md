@@ -1,7 +1,4 @@
-# ClassConnect Template Service
-
-[![CI/CD Pipeline](https://github.com/memo2-2025-1C-group9/template-service/actions/workflows/cicd.yml/badge.svg)](https://github.com/memo2-2025-1C-group9/template-service/actions/workflows/cicd.yml)
-
+# Notification service
 
 ## Tabla de Contenido
 1. Introduccion
@@ -19,26 +16,11 @@ En nuestra plataforma de aprendizaje de la proxima generacion
 podras crear, editar y eliminar tus cursos como mejor te parezca.
 Cada curso tendra titulo y descripcion y podras consultarlos cuando gustes!
 
-## Requisitos Previos
-- Python 3
-- Docker
-
-## Requisitos (incluidos en el Dockerfile)
-- FastAPI: Framework para contruir la API.
-- Uvicorn: Servidor para ejecutar FastAPI.
-- Pydantic: Manejar y validar modelos de datos usados.
-- Pytest: Framewor de testing de Python.
-
-Se pueden instalar localmente en caso de no usar el Dockerfile:
-```sh
-pip install -r requirements.txt
-```
-
 ## Instalacion
 1. Clonar el Repo:
 ```sh
-git clone https://github.com/florenciavillar/template-service.git
-cd  template-service
+git clone https://github.com/memo2-2025-1C-group9/notification-service.git
+cd  notification-service
 ```
 
 2. Crear el env development a partir del example:
@@ -48,19 +30,90 @@ cp .env.example .env.development
 
 ## Run
 ```sh
-docker-compose up --build
+docker-compose --profile app up --build
 ```
 
-## FastAPI Links
-Puedes probar endpoints en FastAPI
 
-http://localhost:8080/docs#/
+## Documentación de Endpoints
 
-Ver mas documentacion de endpoints aca! http://localhost:8080/redoc
+### Gestión de Preferencias de Usuario
 
-## Pytest Links
-user-guide: https://docs.pytest.org/en/stable/how-to/index.html
-fixture: https://docs.pytest.org/en/stable/reference/fixtures.html#fixtures
+```
+GET /me/preferences
+```
+Obtiene las preferencias de notificación del usuario autenticado.
+
+**Autenticación**: Requiere JWT token del usuario en header como **bearer token**
+
+**Respuesta**: 
+```json
+{
+    "id": 1,
+    "examen_email": bool,
+    "examen_push": bool,
+    "tarea_email": bool,
+    "tarea_push": bool
+}
+```
+
+#### PUT /me/editpreferences
+Actualiza las preferencias de notificación del usuario.
+
+**Autenticación**: Requiere JWT token del usuario en header como **bearer token**
+
+**Body**:
+```json
+{
+    "examen_email": bool,
+    "examen_push": bool,
+    "tarea_email": bool,
+    "tarea_push": bool
+}
+```
+
+### Notificaciones
+
+#### POST /notify/user
+Crea una notificación para un usuario específico.
+
+**Autenticación**: Requiere JWT token del **servicio** en header como **bearer token**
+
+**Body**:
+```json
+{
+    "id_user": 1,
+    "notification_type": "Tarea",
+    "event": "Entregado",
+    "data": {
+        "titulo": "Tarea 1",
+        "descripcion": "Descripción de la tarea",
+        "fecha": "2024-03-20",
+        "instrucciones": "Instrucciones de la tarea",
+        "nota": 9.5,
+        "feedback": "Excelente trabajo"
+    }
+}
+```
+
+#### POST /notify/course
+Crea una notificación para todos los usuarios de un curso.
+
+**Autenticación**: Requiere JWT token del **servicio** en header como **bearer token**
+
+**Body**:
+```json
+{
+    "id_course": "curso-123",
+    "notification_type": "Tarea",
+    "event": "Nuevo",
+    "data": {
+        "titulo": "Tarea 1",
+        "descripcion": "Descripción de la tarea",
+        "fecha": "2024-03-20",
+        "instrucciones": "Instrucciones de la tarea"
+    }
+}
+```
 
 ## Despliegue en Render
 
