@@ -3,6 +3,7 @@ from app.core.config import settings
 from sqlalchemy.orm import Session
 from app.schemas.notification_schemas import UserPreferences
 from app.repositories.user_repository import get_user_by_id, create_user, update_user
+from app.repositories.notification_log_repository import get_user_logs_by_id
 from app.core.auth import get_service_auth
 import httpx
 import logging
@@ -106,4 +107,20 @@ async def get_info_user(user_id: int, retry: bool = True):
         logging.error(f"Error al conectar con el servicio de usuarios: {str(e)}")
         raise HTTPException(
             status_code=500, detail="Error al conectar con el servicio de usuarios"
+        )
+
+
+def get_user_logs(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+    """
+    Obtiene los logs del usuario.
+    """
+    try:
+        logging.info(f"Obteniendo logs del usuario con id: {user_id}")
+        return get_user_logs_by_id(db, user_id, skip, limit)
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500, detail=f"Error al obtener logs del usuario: {str(e)}"
         )

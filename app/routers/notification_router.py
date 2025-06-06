@@ -1,5 +1,5 @@
 import traceback
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
 from sqlalchemy.orm import Session
@@ -13,6 +13,7 @@ from app.controller.user_controller import (
     handle_validate_user,
     handle_get_user,
     handle_edit_user,
+    handle_get_user_logs,
 )
 from app.controller.notification_controller import handle_add_queue_message
 import logging
@@ -165,6 +166,35 @@ async def create_course_notification(
         logging.error(f"Exception no manejada al crear notificación de curso: {str(e)}")
         logging.error(traceback.format_exc())
 
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+
+
+@router.get("/me/logs")
+async def get_my_notification_logs(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    try:
+        # Validar el user con el auth service
+        user_id = await handle_validate_user(token)
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales de autenticación inválidas",
+            )
+
+        logs = handle_get_user_logs(db, user_id, skip, limit)
+        return logs
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error al obtener logs de usuario: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error interno del servidor",

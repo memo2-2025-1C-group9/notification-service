@@ -10,6 +10,7 @@ from app.services.email_notification import send_email
 from app.services.user_service import get_info_user
 from app.utils.notification_formatter import format_notification
 from app.db.session import SessionLocal
+from app.repositories.notification_log_repository import create_log
 import json
 import logging
 
@@ -137,13 +138,43 @@ def send_notifications(user, user_id, email, notification, subject, body):
         logging.info(
             f"Procesando notificación de {notification.notification_type} EMAIL para usuario {user_id}"
         )
-        send_email(email, subject, body)
+        try:
+            send_email(email, subject, body)
+
+            create_log(
+                db=SessionLocal(),
+                user_id=user_id,
+                notification_type=notification.notification_type,
+                event=notification.event,
+                method="email",
+                subject=subject,
+                body=body,
+            )
+        except Exception as e:
+            logging.error(
+                f"Error al enviar notificación de {notification.notification_type} EMAIL para usuario {user_id}: {str(e)}"
+            )
 
     if should_notify(user, notification.notification_type, "push"):
-        # TODO: Implementar lógica para notificación push
         logging.info(
             f"Procesando notificación de {notification.notification_type} PUSH para usuario {user_id}"
         )
+        try:
+            # TODO: Implementar lógica para notificación push
+
+            create_log(
+                db=SessionLocal(),
+                user_id=user_id,
+                notification_type=notification.notification_type,
+                event=notification.event,
+                method="push",
+                subject=subject,
+                body=body,
+            )
+        except Exception as e:
+            logging.error(
+                f"Error al enviar notificación de {notification.notification_type} PUSH para usuario {user_id}"
+            )
 
 
 def should_notify(user, notification_type: str, method: str) -> bool:

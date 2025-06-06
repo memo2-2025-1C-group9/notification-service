@@ -1,6 +1,7 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from fastapi import HTTPException, status
 from app.core.config import settings
 import logging
 
@@ -25,5 +26,8 @@ def send_email(to_email: str, subject: str, body: str):
             f"Correo enviado a {to_email} con éxito. Asunto: {subject}. Cuerpo: {body}"
         )
     except Exception as e:
-        # TODO LANZAR HHTPEXCEPTION Y ATRAPARLO EN ALGUN LADO, PARA VER LOS LOGS, ACA NO DEVUELVO NADA A NADIE
         logging.error(f"Error al enviar el correo a {to_email}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error al enviar el correo",
+        )
