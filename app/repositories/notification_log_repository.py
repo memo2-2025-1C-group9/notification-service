@@ -3,6 +3,7 @@ from app.models.notification_log import NotificationLog
 from typing import List
 import logging
 
+
 def create_log(
     db: Session,
     user_id: int,
@@ -32,7 +33,9 @@ def create_log(
 def get_user_logs_by_id(
     db: Session, user_id: int, skip: int = 0, limit: int = 100
 ) -> List[NotificationLog]:
-    logging.info(f"Obteniendo logs de notificaciones para user_id={user_id}, skip={skip}, limit={limit}")
+    logging.info(
+        f"Obteniendo logs de notificaciones para user_id={user_id}, skip={skip}, limit={limit}"
+    )
     return (
         db.query(NotificationLog)
         .filter(NotificationLog.user_id == user_id)
