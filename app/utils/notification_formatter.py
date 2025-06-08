@@ -3,37 +3,6 @@
 from typing import Tuple, Dict, Callable
 from app.schemas.notification_schemas import NotificationEventData
 
-# TODO: Toda esta data y formatos de mensajes anotarlo en el README
-
-# Desde el assessment recibo:
-"""
-Esto me llega para Examen/Tarea Nuevo/Actualizado
-payload = {
-    "id_course": task_result.course_id,
-    "notification_type": "Tarea",
-    "event": event,
-    "data": {
-        "titulo": task_result.title,
-        "descripcion": task_result.description,
-        "fecha": task_result.start_date.isoformat(),
-        "instrucciones": task_result.instructions,
-    },
-}
-Entrega/Calificacion
-{
-        "id_user": task_result.student_id,
-        "notification_type": "Tarea",
-        "event": event,
-        "data": {
-            "titulo": task_result.task_id,
-            "feedback": task_result.feedback,
-            "fecha": task_result.submitted_at.isoformat(),
-            "nota": task_result.grade
-        }
-    }
-
-"""
-
 
 def format_nuevo(data: NotificationEventData):
     return (
