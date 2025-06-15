@@ -201,7 +201,7 @@ async def get_my_notification_logs(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error interno del servidor",
         )
-    
+
 
 @router.put("/me/editfcmtoken")
 async def edit_fmc_token(

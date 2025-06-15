@@ -161,9 +161,7 @@ def send_notifications(user, user_id, email, notification, subject, body):
             f"Procesando notificación de {notification.notification_type} PUSH para usuario {user_id}"
         )
         try:
-            send_push_notification(
-                user.token_fcm, subject, body
-            )
+            send_push_notification(user.token_fcm, subject, body)
 
             create_log(
                 db=SessionLocal(),

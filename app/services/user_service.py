@@ -2,7 +2,12 @@ from fastapi import HTTPException
 from app.core.config import settings
 from sqlalchemy.orm import Session
 from app.schemas.notification_schemas import UserPreferences, FCMToken
-from app.repositories.user_repository import get_user_by_id, create_user, update_user, update_fcm_token
+from app.repositories.user_repository import (
+    get_user_by_id,
+    create_user,
+    update_user,
+    update_fcm_token,
+)
 from app.repositories.notification_log_repository import get_user_logs_by_id
 from app.core.auth import get_service_auth
 import httpx

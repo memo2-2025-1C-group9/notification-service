@@ -64,5 +64,6 @@ class UserPreferences(BaseModel):
     tarea_email: bool | None = None
     tarea_push: bool | None = None
 
+
 class FCMToken(BaseModel):
     fcm_token: str

@@ -19,8 +19,11 @@ def initialize_firebase():
         )
         firebase_admin.initialize_app(cred)
 
+
 def send_push_notification(fcm_token: str, title: str, body: str):
-    logging.info(f"Enviando notificación push a {fcm_token} con título '{title}' y cuerpo '{body}'")
+    logging.info(
+        f"Enviando notificación push a {fcm_token} con título '{title}' y cuerpo '{body}'"
+    )
     try:
         initialize_firebase()
     except Exception as e:
@@ -28,16 +31,12 @@ def send_push_notification(fcm_token: str, title: str, body: str):
     try:
         # Probablemente el body sea enorme para una push
         message = messaging.Message(
-            notification=messaging.Notification(
-                title=title,
-                body=body
-            ),
-            token=fcm_token
+            notification=messaging.Notification(title=title, body=body), token=fcm_token
         )
-        
+
         response = messaging.send(message)
         logging.info(f"Notificación enviada exitosamente: {response}")
         return True
     except Exception as e:
         logging.info(f"Error al enviar la notificación: {str(e)}")
-        return False 
+        return False
