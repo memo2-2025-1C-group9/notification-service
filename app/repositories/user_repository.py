@@ -40,3 +40,18 @@ def update_user(db: Session, user_id: int, user_data: UserPreferences):
     db.commit()
     db.refresh(user)
     return user
+
+
+def update_fcm_token(db: Session, user_id: int, fcm_token: str):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado",
+        )
+
+    user.token_fcm = fcm_token
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user

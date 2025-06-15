@@ -8,12 +8,14 @@ from app.schemas.notification_schemas import (
     UserPreferences,
     UserNotificationEvent,
     CourseNotificationEvent,
+    FCMToken,
 )
 from app.controller.user_controller import (
     handle_validate_user,
     handle_get_user,
     handle_edit_user,
     handle_get_user_logs,
+    handle_edit_fcm_token,
 )
 from app.controller.notification_controller import handle_add_queue_message
 import logging
@@ -195,6 +197,38 @@ async def get_my_notification_logs(
         raise
     except Exception as e:
         logging.error(f"Error al obtener logs de usuario: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    
+
+@router.put("/me/editfcmtoken")
+async def edit_fmc_token(
+    jwt_token: Annotated[str, Depends(oauth2_scheme)],
+    user_fcm_token: FCMToken,
+    db: Session = Depends(get_db),
+):
+    try:
+        # Validar el user con el auth service
+        user_id = await handle_validate_user(jwt_token)
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales de autenticación inválidas",
+            )
+
+        return handle_edit_fcm_token(db, user_id, user_fcm_token)
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        logging.error(
+            f"Exception no manejada al editar preferencias de usuario: {str(e)}"
+        )
+        logging.error(traceback.format_exc())
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error interno del servidor",
