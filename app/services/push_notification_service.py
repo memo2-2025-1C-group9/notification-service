@@ -1,6 +1,7 @@
+import json
 import firebase_admin
 from firebase_admin import credentials, messaging
-from pathlib import Path
+from app.core.config import settings
 import logging
 
 
@@ -15,9 +16,11 @@ def initialize_firebase():
     except ValueError:
         # Si no existe, inicializa una nueva
         cred = credentials.Certificate(
-            Path(__file__).parent.parent.parent / "config" / "firebase-credentials.json"
+            json.loads(settings.FIREBASE_ADMIN_SDK_CREDENTIALS)
         )
         firebase_admin.initialize_app(cred)
+
+        logging.info("Firebase Admin SDK inicializado correctamente.")
 
 
 def send_push_notification(fcm_token: str, title: str, body: str):

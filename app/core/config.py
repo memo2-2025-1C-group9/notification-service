@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     SERVICE_USERNAME: str
     SERVICE_PASSWORD: str
 
+    FIREBASE_ADMIN_SDK_CREDENTIALS: str
+
 
 try:
     settings = Settings()
