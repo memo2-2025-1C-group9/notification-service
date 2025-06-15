@@ -76,6 +76,8 @@ jobs:
           
           SERVICE_USERNAME: ${{ secrets.SERVICE_USERNAME }}
           SERVICE_PASSWORD: ${{ secrets.SERVICE_PASSWORD }}
+
+          FIREBASE_ADMIN_SDK_CREDENTIALS: ${{ secrets.FIREBASE_ADMIN_SDK_CREDENTIALS }}
         run: |
           docker-compose --profile app up -d
           docker-compose logs -f &
@@ -128,6 +130,8 @@ jobs:
           
           SERVICE_USERNAME: ${{ secrets.SERVICE_USERNAME }}
           SERVICE_PASSWORD: ${{ secrets.SERVICE_PASSWORD }}
+
+          FIREBASE_ADMIN_SDK_CREDENTIALS: ${{ secrets.FIREBASE_ADMIN_SDK_CREDENTIALS }}
         run: |
           PYTHONPATH=. pytest --cov=app --cov=tests --cov-report=term-missing --cov-report=xml --cov-report=html
 
