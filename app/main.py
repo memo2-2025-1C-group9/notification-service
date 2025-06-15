@@ -14,6 +14,8 @@ from app.core.config import settings
 logging.getLogger("pika").setLevel(logging.INFO)
 logging.getLogger("httpcore").setLevel(logging.INFO)
 
+worker_thread: threading.Thread | None = None
+
 if settings.ENVIRONMENT != "test":
     # Crear todas las tablas al iniciar la aplicación
     try:
@@ -24,9 +26,10 @@ if settings.ENVIRONMENT != "test":
         logging.error(traceback.format_exc())
 
     try:
-        thread = threading.Thread(target=worker_main, daemon=True)
-        thread.start()
-        logging.info("Worker thread started")
+        if worker_thread is None or not worker_thread.is_alive():
+            worker_thread = threading.Thread(target=worker_main, daemon=True)
+            worker_thread.start()
+            logging.info("Worker thread started")
     except Exception as e:
         logging.error(f"Error starting worker thread: {str(e)}")
         logging.error(traceback.format_exc())
@@ -86,4 +89,14 @@ app.include_router(notification_router)
 
 @app.get("/health")
 def get_health():
+    global worker_thread
+    if worker_thread is None or not worker_thread.is_alive():
+        logging.warning("Worker thread not alive. Restarting...")
+        try:
+            worker_thread = threading.Thread(target=worker_main, daemon=True)
+            worker_thread.start()
+            logging.info("Worker thread restarted from /health")
+        except Exception as e:
+            logging.error(f"Failed to restart worker: {e}")
+            return {"status": "worker restart failed"}
     return {"status": "ok"}

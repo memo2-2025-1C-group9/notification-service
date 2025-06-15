@@ -1,8 +1,13 @@
 from fastapi import HTTPException
 from app.core.config import settings
 from sqlalchemy.orm import Session
-from app.schemas.notification_schemas import UserPreferences
-from app.repositories.user_repository import get_user_by_id, create_user, update_user
+from app.schemas.notification_schemas import UserPreferences, FCMToken
+from app.repositories.user_repository import (
+    get_user_by_id,
+    create_user,
+    update_user,
+    update_fcm_token,
+)
 from app.repositories.notification_log_repository import get_user_logs_by_id
 from app.core.auth import get_service_auth
 import httpx
@@ -123,4 +128,19 @@ def get_user_logs(db: Session, user_id: int, skip: int = 0, limit: int = 100):
         db.rollback()
         raise HTTPException(
             status_code=500, detail=f"Error al obtener logs del usuario: {str(e)}"
+        )
+
+
+def edit_fcm_token(db: Session, user_id: int, fcm_token: FCMToken):
+    """
+    Edita el token FCM del usuario.
+    """
+    try:
+        logging.info(f"Editando token FCM del usuario con id: {user_id}")
+        return update_fcm_token(db, user_id, fcm_token.fcm_token)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error al editar token FCM del usuario: {str(e)}"
         )

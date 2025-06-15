@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Boolean
+from sqlalchemy import Column, Integer, Boolean, String
 from app.db.base import Base
 
 
@@ -10,3 +10,5 @@ class User(Base):
 
     examen_email = Column(Boolean, default=True, nullable=False)
     examen_push = Column(Boolean, default=True, nullable=False)
+
+    token_fcm = Column(String, nullable=True)

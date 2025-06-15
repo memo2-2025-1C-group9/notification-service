@@ -76,6 +76,8 @@ jobs:
           
           SERVICE_USERNAME: ${{ secrets.SERVICE_USERNAME }}
           SERVICE_PASSWORD: ${{ secrets.SERVICE_PASSWORD }}
+
+          FIREBASE_ADMIN_SDK_CREDENTIALS: ${{ secrets.FIREBASE_ADMIN_SDK_CREDENTIALS }}
         run: |
           docker-compose --profile app up -d
           docker-compose logs -f &
@@ -128,6 +130,8 @@ jobs:
           
           SERVICE_USERNAME: ${{ secrets.SERVICE_USERNAME }}
           SERVICE_PASSWORD: ${{ secrets.SERVICE_PASSWORD }}
+
+          FIREBASE_ADMIN_SDK_CREDENTIALS: ${{ secrets.FIREBASE_ADMIN_SDK_CREDENTIALS }}
         run: |
           PYTHONPATH=. pytest --cov=app --cov=tests --cov-report=term-missing --cov-report=xml --cov-report=html
 
@@ -135,7 +139,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: services/notification-service/htmlcov/
+          path: htmlcov/
           retention-days: 1
 
       - name: Upload coverage to Codecov
@@ -159,7 +163,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: coverage-report
-          path: services/notification-service/htmlcov
+          path: htmlcov
 
       - name: Checkout GitHub Pages
         uses: actions/checkout@v4
@@ -171,7 +175,7 @@ jobs:
       - name: Update coverage report
         run: |
           mkdir -p pages/coverages/notification-service
-          cp -r services/notification-service/htmlcov/* pages/coverages/notification-service/
+          cp -r htmlcov/* pages/coverages/notification-service/
 
       - name: Commit and push changes
         working-directory: pages

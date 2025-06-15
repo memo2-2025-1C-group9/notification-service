@@ -11,6 +11,7 @@ from app.services.user_service import get_info_user
 from app.utils.notification_formatter import format_notification
 from app.db.session import SessionLocal
 from app.repositories.notification_log_repository import create_log
+from app.services.push_notification_service import send_push_notification
 import json
 import logging
 
@@ -160,7 +161,7 @@ def send_notifications(user, user_id, email, notification, subject, body):
             f"Procesando notificación de {notification.notification_type} PUSH para usuario {user_id}"
         )
         try:
-            # TODO: Implementar lógica para notificación push
+            send_push_notification(user.token_fcm, subject, body)
 
             create_log(
                 db=SessionLocal(),
@@ -173,7 +174,7 @@ def send_notifications(user, user_id, email, notification, subject, body):
             )
         except Exception as e:
             logging.error(
-                f"Error al enviar notificación de {notification.notification_type} PUSH para usuario {user_id}"
+                f"Error al enviar notificación de {notification.notification_type} PUSH para usuario {user_id}: {str(e)}"
             )
 
 
