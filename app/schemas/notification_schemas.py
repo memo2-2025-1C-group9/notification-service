@@ -8,6 +8,7 @@ class NotificationEventType(str, Enum):
     COURSE = "course_notification"
     AUX_TEACHER = "aux_teacher_notification"
 
+
 class NotificationEventData(BaseModel):
     titulo: str
     descripcion: str | None = None
@@ -76,7 +77,9 @@ class FCMToken(BaseModel):
     fcm_token: str
 
 
-class UserPermissions(BaseModel): # TODO ojo con el update y como llega porque si pongo todo false y envio el mensaje con esa info va a estar mal
+class UserPermissions(
+    BaseModel
+):  # TODO ojo con el update y como llega porque si pongo todo false y envio el mensaje con esa info va a estar mal
     edit_course: bool = False
     create_module: bool = False
     create_task: bool = False
@@ -88,4 +91,4 @@ class AuxiliaryTeacherNotificationEvent(BaseModel):
     event: Literal["add", "remove", "update"]
     id_course: str
     teacher_id: int
-    permissions: UserPermissions = None # en delete este campo no viene
+    permissions: UserPermissions = None  # en delete este campo no viene

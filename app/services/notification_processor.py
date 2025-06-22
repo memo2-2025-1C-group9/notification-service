@@ -3,7 +3,7 @@ from app.schemas.notification_schemas import (
     UserNotificationEvent,
     CourseNotificationEvent,
     AuxiliaryTeacherNotificationEvent,
-    NotificationEventType
+    NotificationEventType,
 )
 from app.schemas.user_schema import UserInfo
 from app.repositories.user_repository import get_user_by_id, create_user
@@ -68,17 +68,19 @@ def should_notify(user, notification_type: str, method: str) -> bool:
 
 
 def send_notifications(user, user_id, email, notification, subject, body):
-    if notification.event_type == NotificationEventType.AUX_TEACHER or should_notify(user, notification.notification_type, "email"):
-        logging.info(
-            f"Procesando notificación EMAIL para usuario {user_id}"
-        )
+    if notification.event_type == NotificationEventType.AUX_TEACHER or should_notify(
+        user, notification.notification_type, "email"
+    ):
+        logging.info(f"Procesando notificación EMAIL para usuario {user_id}")
         try:
             send_email(email, subject, body)
 
             create_log(
                 db=SessionLocal(),
                 user_id=user_id,
-                notification_type=notification.notification_type if notification.event_type != NotificationEventType.AUX_TEACHER else "Auxiliar",
+                notification_type=notification.notification_type
+                if notification.event_type != NotificationEventType.AUX_TEACHER
+                else "Auxiliar",
                 event=notification.event,
                 method="email",
                 subject=subject,
@@ -89,17 +91,19 @@ def send_notifications(user, user_id, email, notification, subject, body):
                 f"Error al enviar notificación EMAIL para usuario {user_id}: {str(e)}"
             )
 
-    if notification.event_type == NotificationEventType.AUX_TEACHER or should_notify(user, notification.notification_type, "push"):
-        logging.info(
-            f"Procesando notificación de PUSH para usuario {user_id}"
-        )
+    if notification.event_type == NotificationEventType.AUX_TEACHER or should_notify(
+        user, notification.notification_type, "push"
+    ):
+        logging.info(f"Procesando notificación de PUSH para usuario {user_id}")
         try:
             send_push_notification(user.token_fcm, subject, body)
 
             create_log(
                 db=SessionLocal(),
                 user_id=user_id,
-                notification_type=notification.notification_type if notification.event_type != NotificationEventType.AUX_TEACHER else "Auxiliar",
+                notification_type=notification.notification_type
+                if notification.event_type != NotificationEventType.AUX_TEACHER
+                else "Auxiliar",
                 event=notification.event,
                 method="push",
                 subject=subject,
@@ -191,9 +195,11 @@ async def process_course_notification(notification: CourseNotificationEvent):
         raise HTTPException(
             status_code=500, detail=f"Error al procesar notificación de curso"
         )
-    
 
-async def process_aux_teacher_notification(notification: AuxiliaryTeacherNotificationEvent):
+
+async def process_aux_teacher_notification(
+    notification: AuxiliaryTeacherNotificationEvent,
+):
     try:
         logging.info(
             f"Procesando notificación de docente auxiliar: {notification.id_course}, tipo: {notification.event_type}, evento: {notification.event}"
@@ -223,12 +229,12 @@ async def process_aux_teacher_notification(notification: AuxiliaryTeacherNotific
 
         send_notifications(user, user_id, user_info.email, notification, subject, body)
 
-
     except HTTPException:
         raise
 
     except Exception as e:
         logging.error(f"Error al procesar notificación de docente auxiliar: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Error al procesar notificación de docente auxiliar"
+            status_code=500,
+            detail=f"Error al procesar notificación de docente auxiliar",
         )
