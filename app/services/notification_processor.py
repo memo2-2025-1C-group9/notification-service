@@ -11,6 +11,7 @@ from app.services.courses_service import get_course_users
 from app.services.email_notification import send_email
 from app.services.user_service import get_info_user
 from app.utils.notification_formatter import format_notification
+
 from app.db.session import SessionLocal
 from app.repositories.notification_log_repository import create_log
 from app.services.push_notification_service import send_push_notification
