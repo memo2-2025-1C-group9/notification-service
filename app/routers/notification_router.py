@@ -9,6 +9,7 @@ from app.schemas.notification_schemas import (
     UserNotificationEvent,
     CourseNotificationEvent,
     FCMToken,
+    AuxiliaryTeacherNotificationEvent,
 )
 from app.controller.user_controller import (
     handle_validate_user,
@@ -226,6 +227,49 @@ async def edit_fmc_token(
     except Exception as e:
         logging.error(
             f"Exception no manejada al editar preferencias de usuario: {str(e)}"
+        )
+        logging.error(traceback.format_exc())
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+
+
+@router.post("/notify/auxiliary-teacher")
+async def create_user_notification(
+    notification: AuxiliaryTeacherNotificationEvent,
+    token: Annotated[str, Depends(oauth2_scheme)],
+):
+    """
+    Crea una notificación de docente auxiliar y la agrega a la cola de mensajes.
+    """
+    try:
+        try:
+            await handle_validate_user(token)
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales de autenticación inválidas",
+            )
+
+        if handle_add_queue_message(notification):
+            return {
+                "success": True,
+                "message": "Mensaje agregado a la cola correctamente.",
+            }
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error al agregar mensaje a la cola",
+            )
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        logging.error(
+            f"Exception no manejada al crear notificación de docente auxiliar: {str(e)}"
         )
         logging.error(traceback.format_exc())
 
