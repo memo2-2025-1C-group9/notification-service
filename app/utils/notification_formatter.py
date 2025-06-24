@@ -38,7 +38,7 @@ def format_calificado(data: NotificationEventData):
 def format_add_aux_teacher(notificacion: AuxiliaryTeacherNotificationEvent):
     return (
         "Bienvenido como docente auxiliar",
-        f"Has sido invitado como docente auxiliar al curso: {notificacion.id_course}.\n\nPermisos otorgados:\n"
+        f"Has sido invitado como docente auxiliar al curso: {notificacion.course_name}.\n\nPermisos otorgados:\n"
         + (
             f"• Editar curso: {'Sí' if notificacion.permissions.edit_course else 'No'}\n"
             if notificacion.permissions
@@ -65,14 +65,14 @@ def format_add_aux_teacher(notificacion: AuxiliaryTeacherNotificationEvent):
 def format_remove_aux_teacher(notificacion: AuxiliaryTeacherNotificationEvent):
     return (
         "Acceso removido como docente auxiliar",
-        f"Tu acceso como docente auxiliar al curso: {notificacion.id_course} ha sido removido.",
+        f"Tu acceso como docente auxiliar al curso: {notificacion.course_name} ha sido removido.",
     )
 
 
 def format_update_aux_teacher(notificacion: AuxiliaryTeacherNotificationEvent):
     return (
         "Permisos actualizados como docente auxiliar",
-        f"Tus permisos como docente auxiliar para el curso: {notificacion.id_course} han sido actualizados.\n\nNuevos permisos:\n"
+        f"Tus permisos como docente auxiliar para el curso: {notificacion.course_name} han sido actualizados.\n\nNuevos permisos:\n"
         + (
             f"• Editar curso: {'Sí' if notificacion.permissions.edit_course else 'No'}\n"
             if notificacion.permissions

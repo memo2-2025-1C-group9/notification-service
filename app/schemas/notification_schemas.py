@@ -90,5 +90,6 @@ class AuxiliaryTeacherNotificationEvent(BaseModel):
     event_type: NotificationEventType = NotificationEventType.AUX_TEACHER
     event: Literal["add", "remove", "update"]
     id_course: str
+    course_name: str
     teacher_id: int
     permissions: UserPermissions = None  # en delete este campo no viene
