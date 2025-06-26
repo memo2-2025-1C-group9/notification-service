@@ -1,5 +1,5 @@
 import pytest
-from fastapi import status
+from fastapi import HTTPException, status
 from app.models.user import User
 
 
@@ -105,3 +105,46 @@ def test_edit_user_preferences_not_found(client, mock_auth_service, db_session):
     )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+fcm_token_data = {"fcm_token": "fcm_token_example_12345"}
+
+
+def test_edit_fcm_token_success(client, mock_auth_service, db_session):
+    mock_auth_service.return_value = 1
+
+    response = client.put(
+        "/me/editfcmtoken",
+        headers={"Authorization": "Bearer valid_token"},
+        json=fcm_token_data,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["token_fcm"] == fcm_token_data["fcm_token"]
+
+
+def test_edit_fcm_token_unauthorized(client, mock_auth_service):
+    mock_auth_service.side_effect = None
+
+    response = client.put(
+        "/me/editfcmtoken",
+        headers={"Authorization": "Bearer invalid_token"},
+        json=fcm_token_data,
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_edit_fcm_token_invalid_data(client, mock_auth_service):
+    mock_auth_service.return_value = 1
+
+    invalid_data = {"fcm_token": ""}  # Token vacío
+
+    response = client.put(
+        "/me/editfcmtoken",
+        headers={"Authorization": "Bearer valid_token"},
+        json=invalid_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
