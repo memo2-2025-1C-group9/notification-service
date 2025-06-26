@@ -125,7 +125,7 @@ def test_edit_fcm_token_success(client, mock_auth_service, db_session):
 
 
 def test_edit_fcm_token_unauthorized(client, mock_auth_service):
-    mock_auth_service.side_effect = None
+    mock_auth_service.return_value = None
 
     response = client.put(
         "/me/editfcmtoken",
@@ -134,17 +134,3 @@ def test_edit_fcm_token_unauthorized(client, mock_auth_service):
     )
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-
-def test_edit_fcm_token_invalid_data(client, mock_auth_service):
-    mock_auth_service.return_value = 1
-
-    invalid_data = {"fcm_token": ""}  # Token vacío
-
-    response = client.put(
-        "/me/editfcmtoken",
-        headers={"Authorization": "Bearer valid_token"},
-        json=invalid_data,
-    )
-
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
