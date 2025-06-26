@@ -197,7 +197,6 @@ def test_get_user_preferences_create_new_user(mock_user_repository):
     assert result == new_user
 
 
-@pytest.mark.asyncio
 async def test_send_notifications_aux_teacher_always_sends(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -205,7 +204,7 @@ async def test_send_notifications_aux_teacher_always_sends(
     user = User(id=1, token_fcm="fcm_token_123")
     notification = AuxiliaryTeacherNotificationEvent(**auxiliary_teacher_data)
 
-    await send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
+    send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
 
     # Verificar que se envio email
     mock_email_service.assert_called_once_with("test@test.com", "Asunto", "Cuerpo")
@@ -215,7 +214,6 @@ async def test_send_notifications_aux_teacher_always_sends(
     assert mock_log_repository.call_count == 2
 
 
-@pytest.mark.asyncio
 async def test_send_notifications_user_email_enabled(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -223,7 +221,7 @@ async def test_send_notifications_user_email_enabled(
     user = User(id=1, tarea_email=True, tarea_push=False, token_fcm="fcm_token_123")
     notification = UserNotificationEvent(**user_notification_data)
 
-    await send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
+    send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
 
     # Verificar que se envió email
     mock_email_service.assert_called_once_with("test@test.com", "Asunto", "Cuerpo")
@@ -233,7 +231,6 @@ async def test_send_notifications_user_email_enabled(
     mock_log_repository.assert_called_once()
 
 
-@pytest.mark.asyncio
 async def test_send_notifications_user_push_enabled(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -241,7 +238,7 @@ async def test_send_notifications_user_push_enabled(
     user = User(id=1, tarea_email=False, tarea_push=True, token_fcm="fcm_token_123")
     notification = UserNotificationEvent(**user_notification_data)
 
-    await send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
+    send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
 
     # Verificar que NO se envió email
     mock_email_service.assert_not_called()
@@ -251,7 +248,6 @@ async def test_send_notifications_user_push_enabled(
     mock_log_repository.assert_called_once()
 
 
-@pytest.mark.asyncio
 async def test_send_notifications_user_both_disabled(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -259,7 +255,7 @@ async def test_send_notifications_user_both_disabled(
     user = User(id=1, tarea_email=False, tarea_push=False, token_fcm="fcm_token_123")
     notification = UserNotificationEvent(**user_notification_data)
 
-    await send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
+    send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
 
     # Verificar que NO se envió email
     mock_email_service.assert_not_called()
@@ -541,7 +537,6 @@ async def test_process_message_exception_handling():
         await process_message(message_body)
 
 
-@pytest.mark.asyncio
 async def test_send_notifications_without_fcm_token(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -549,7 +544,7 @@ async def test_send_notifications_without_fcm_token(
     user = User(id=1, tarea_email=False, tarea_push=True, token_fcm=None)
     notification = UserNotificationEvent(**user_notification_data)
 
-    await send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
+    send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
 
     # Verificar que NO se envió push (porque no hay token)
     mock_push_service.assert_not_called()
@@ -557,7 +552,6 @@ async def test_send_notifications_without_fcm_token(
     mock_log_repository.assert_not_called()
 
 
-@pytest.mark.asyncio
 async def test_send_notifications_empty_fcm_token(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -565,7 +559,7 @@ async def test_send_notifications_empty_fcm_token(
     user = User(id=1, tarea_email=False, tarea_push=True, token_fcm="")
     notification = UserNotificationEvent(**user_notification_data)
 
-    await send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
+    send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
 
     # Verificar que se intentó enviar push (aunque falle)
     mock_push_service.assert_called_once_with("", "Asunto", "Cuerpo")
