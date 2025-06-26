@@ -97,7 +97,7 @@ def send_notifications(user, user_id, email, notification, subject, body):
     ):
         logging.info(f"Procesando notificación de PUSH para usuario {user_id}")
         try:
-            if not user.token_fcm:
+            if not user.token_fcm or not user.token_fcm.strip():
                 logging.warning(
                     f"Usuario {user_id} no tiene token FCM, no se enviará notificación PUSH"
                 )
