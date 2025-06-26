@@ -1,37 +1,72 @@
 # app/domain/notification_formatter.py
-
+from datetime import datetime
 from typing import Tuple, Dict, Callable
 from app.schemas.notification_schemas import (
-    NotificationEventData,
+    UserNotificationEvent,
     AuxiliaryTeacherNotificationEvent,
+    CourseNotificationEvent
 )
 
+def formatear_fecha_legible(fecha_str):
+    if not fecha_str:
+        return None
 
-def format_nuevo(data: NotificationEventData):
+    try:
+        fecha = datetime.fromisoformat(fecha_str)
+
+        return fecha.strftime("%-d de %B de %Y, %H:%M hs")
+    except Exception as e:
+        return None
+
+def format_nuevo(notification: UserNotificationEvent | CourseNotificationEvent):
+    fecha_formateada = formatear_fecha_legible(notification.data.fecha)
+
+    mensaje = f"{notification.data.descripcion}\n{notification.data.instrucciones}"
+    if fecha_formateada:
+        mensaje += f"\nFecha: {fecha_formateada}"
+
     return (
-        f"{data.titulo}",
-        f"{data.descripcion}\nFecha: {data.fecha}\n{data.instrucciones}",
+        f"[{notification.notification_type}] {notification.data.titulo}",
+        mensaje,
     )
 
 
-def format_actualizado(data: NotificationEventData):
+def format_actualizado(notification: UserNotificationEvent | CourseNotificationEvent):
+    fecha_formateada = formatear_fecha_legible(notification.data.fecha)
+
+    mensaje = "Se actualizaron los datos.\n{notification.data.instrucciones}"
+    if fecha_formateada:
+        mensaje += f"\nFecha: {fecha_formateada}"
+
     return (
-        f"{data.titulo} (Actualizado)",
-        f"Se actualizaron los datos.\nFecha: {data.fecha}\n{data.instrucciones}",
+        f"[{notification.notification_type}] {notification.data.titulo} (Actualizado)",
+        mensaje,
     )
 
 
-def format_entregado(data: NotificationEventData):
+def format_entregado(notification: UserNotificationEvent | CourseNotificationEvent):
+    fecha_formateada = formatear_fecha_legible(notification.data.fecha)
+
+    mensaje = f"Tu entrega fue recibida"
+    if fecha_formateada:
+        mensaje += f"el {fecha_formateada}"
+
     return (
-        f"Entrega recibida: {data.titulo}",
-        f"Tu entrega fue recibida el {data.fecha}.",
+        f"[{notification.notification_type}] Entrega recibida: {notification.data.titulo}",
+        mensaje,
     )
 
 
-def format_calificado(data: NotificationEventData):
+def format_calificado(notification: UserNotificationEvent | CourseNotificationEvent):
+    fecha_formateada = formatear_fecha_legible(notification.data.fecha)
+
+    mensaje = f"Nota: {notification.data.nota}\nComentarios: {notification.data.feedback}"
+    if fecha_formateada:
+        mensaje += f"\nFecha: {fecha_formateada}"
+
     return (
-        f"{data.titulo} calificado",
-        f"Nota: {data.nota}\nComentarios: {data.feedback}\nFecha: {data.fecha}",
+        f"[{notification.notification_type}] {notification.data.titulo} calificado",
+        mensaje,
     )
 
 
@@ -111,7 +146,7 @@ event_formatters: Dict[str, Callable[[Dict], Tuple[str, str]]] = {
 def format_notification(
     notification_type: str,
     event: str,
-    data: NotificationEventData | AuxiliaryTeacherNotificationEvent,
+    notification: UserNotificationEvent | AuxiliaryTeacherNotificationEvent | CourseNotificationEvent,
 ) -> Tuple[str, str]:
     """
     Devuelve (titulo, mensaje) listos para ser enviados.
@@ -120,5 +155,5 @@ def format_notification(
     if not formatter:
         return ("Notificación", "Evento desconocido.")
 
-    subject, body = formatter(data)
+    subject, body = formatter(notification)
     return (subject, body)

@@ -144,7 +144,7 @@ async def process_user_notification(notification: UserNotificationEvent):
             )
         logging.info(f"Usuario obtenido: {user_info}")
         subject, body = format_notification(
-            notification.notification_type, notification.event, notification.data
+            notification.notification_type, notification.event, notification
         )
 
         send_notifications(user, user_id, user_info.email, notification, subject, body)
@@ -186,7 +186,7 @@ async def process_course_notification(notification: CourseNotificationEvent):
             user = get_user_preferences(user_id)
 
             subject, body = format_notification(
-                notification.notification_type, notification.event, notification.data
+                notification.notification_type, notification.event, notification
             )
 
             send_notifications(
