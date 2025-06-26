@@ -6,15 +6,7 @@ from app.schemas.notification_schemas import (
     AuxiliaryTeacherNotificationEvent,
     CourseNotificationEvent
 )
-import locale
 
-try:
-    locale.setlocale(locale.LC_TIME, 'es_ES.utf8')  # Linux/macOS
-except locale.Error:
-    try:
-        locale.setlocale(locale.LC_TIME, 'es_ES')  # Windows
-    except:
-        pass
 
 def formatear_fecha_legible(fecha_str):
     if not fecha_str:
@@ -23,7 +15,7 @@ def formatear_fecha_legible(fecha_str):
     try:
         fecha = datetime.fromisoformat(fecha_str)
 
-        return fecha.strftime("%-d de %B de %Y, %H:%M hs")
+        return fecha.strftime("%d/%m/%Y, %H:%M hs")
     except Exception as e:
         return None
 
