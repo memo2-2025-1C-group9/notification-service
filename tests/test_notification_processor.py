@@ -196,7 +196,7 @@ def test_get_user_preferences_create_new_user(mock_user_repository):
     result = get_user_preferences(1)
     assert result == new_user
 
-
+@pytest.mark.asyncio
 async def test_send_notifications_aux_teacher_always_sends(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -213,7 +213,7 @@ async def test_send_notifications_aux_teacher_always_sends(
     # Verificar que se crearon logs
     assert mock_log_repository.call_count == 2
 
-
+@pytest.mark.asyncio
 async def test_send_notifications_user_email_enabled(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -230,7 +230,7 @@ async def test_send_notifications_user_email_enabled(
     # Verificar que se creó log de email
     mock_log_repository.assert_called_once()
 
-
+@pytest.mark.asyncio
 async def test_send_notifications_user_push_enabled(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -247,7 +247,7 @@ async def test_send_notifications_user_push_enabled(
     # Verificar que se creó log de push
     mock_log_repository.assert_called_once()
 
-
+@pytest.mark.asyncio
 async def test_send_notifications_user_both_disabled(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -536,7 +536,7 @@ async def test_process_message_exception_handling():
         # No debería lanzar excepción, solo loggear error
         await process_message(message_body)
 
-
+@pytest.mark.asyncio
 async def test_send_notifications_without_fcm_token(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
@@ -551,7 +551,7 @@ async def test_send_notifications_without_fcm_token(
     # Verificar que NO se creó log
     mock_log_repository.assert_not_called()
 
-
+@pytest.mark.asyncio
 async def test_send_notifications_empty_fcm_token(
     mock_email_service, mock_push_service, mock_log_repository, mock_session_local
 ):
