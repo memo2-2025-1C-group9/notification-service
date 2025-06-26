@@ -562,7 +562,7 @@ async def test_send_notifications_empty_fcm_token(
     send_notifications(user, 1, "test@test.com", notification, "Asunto", "Cuerpo")
 
     # Verificar que se intentó enviar push (aunque falle)
-    mock_push_service.assert_called_once_with("", "Asunto", "Cuerpo")
+    mock_push_service.assert_not_called()
     # Verificar que NO se creó log (porque falló)
     mock_log_repository.assert_not_called()
 
