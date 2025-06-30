@@ -36,7 +36,7 @@ def format_nuevo(notification: UserNotificationEvent | CourseNotificationEvent):
 def format_actualizado(notification: UserNotificationEvent | CourseNotificationEvent):
     fecha_formateada = formatear_fecha_legible(notification.data.fecha)
 
-    mensaje = "Se actualizaron los datos.\n{notification.data.instrucciones}"
+    mensaje = f"Se actualizaron los datos.\n{notification.data.instrucciones}"
     if fecha_formateada:
         mensaje += f"\nFecha: {fecha_formateada}"
 
