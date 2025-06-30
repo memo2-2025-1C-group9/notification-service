@@ -158,8 +158,11 @@ async def process_user_notification(notification: UserNotificationEvent):
             status_code=500, detail=f"Error al procesar notificación de usuario"
         )
 
+
 async def send_owner_notification(notification: UserNotificationEvent):
-    logging.info(f"Enviando notificación al owner de assessment: {notification.assessment_owner_id}")
+    logging.info(
+        f"Enviando notificación al owner de assessment: {notification.assessment_owner_id}"
+    )
     owner_id = notification.assessment_owner_id
 
     owner = get_user_preferences(owner_id)
@@ -169,16 +172,20 @@ async def send_owner_notification(notification: UserNotificationEvent):
     except Exception:
         logging.error(f"Error al obtener información del owner {owner_id}")
         raise HTTPException(
-                    status_code=500,
-                    detail=f"Error al obtener información del owner: {owner_id}",
-                )
+            status_code=500,
+            detail=f"Error al obtener información del owner: {owner_id}",
+        )
     logging.info(f"Owner de assessment obtenido: {owner_info}")
 
     owner_subject, owner_body = format_notification(
-                notification.notification_type, "EntregaOwner", notification,
-            )
+        notification.notification_type,
+        "EntregaOwner",
+        notification,
+    )
 
-    send_notifications(owner, owner_id, owner_info.email, notification, owner_subject, owner_body)
+    send_notifications(
+        owner, owner_id, owner_info.email, notification, owner_subject, owner_body
+    )
 
 
 async def process_course_notification(notification: CourseNotificationEvent):

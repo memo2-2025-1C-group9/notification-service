@@ -4,7 +4,7 @@ from typing import Tuple, Dict, Callable
 from app.schemas.notification_schemas import (
     UserNotificationEvent,
     AuxiliaryTeacherNotificationEvent,
-    CourseNotificationEvent
+    CourseNotificationEvent,
 )
 
 
@@ -18,6 +18,7 @@ def formatear_fecha_legible(fecha_str):
         return fecha.strftime("%d/%m/%Y, %H:%M hs")
     except Exception as e:
         return None
+
 
 def format_nuevo(notification: UserNotificationEvent | CourseNotificationEvent):
     fecha_formateada = formatear_fecha_legible(notification.data.fecha)
@@ -61,7 +62,9 @@ def format_entregado(notification: UserNotificationEvent | CourseNotificationEve
 def format_calificado(notification: UserNotificationEvent | CourseNotificationEvent):
     fecha_formateada = formatear_fecha_legible(notification.data.fecha)
 
-    mensaje = f"Nota: {notification.data.nota}\nComentarios: {notification.data.feedback}"
+    mensaje = (
+        f"Nota: {notification.data.nota}\nComentarios: {notification.data.feedback}"
+    )
     if fecha_formateada:
         mensaje += f"\nFecha: {fecha_formateada}"
 
@@ -131,10 +134,11 @@ def format_update_aux_teacher(notificacion: AuxiliaryTeacherNotificationEvent):
         ),
     )
 
+
 def format_entrega_owner(notification: UserNotificationEvent):
     fecha_formateada = formatear_fecha_legible(notification.data.fecha)
 
-    mensaje = (f"El usuario {notification.id_user} ha realizado una entrega de [{notification.notification_type}]: {notification.data.titulo}.")
+    mensaje = f"El usuario {notification.id_user} ha realizado una entrega de [{notification.notification_type}]: {notification.data.titulo}."
 
     if fecha_formateada:
         mensaje += f"\nFecha: {fecha_formateada}"
@@ -143,6 +147,7 @@ def format_entrega_owner(notification: UserNotificationEvent):
         f"[{notification.notification_type}] {notification.data.titulo}",
         mensaje,
     )
+
 
 # Tabla de funciones por evento
 event_formatters: Dict[str, Callable[[Dict], Tuple[str, str]]] = {
@@ -160,7 +165,9 @@ event_formatters: Dict[str, Callable[[Dict], Tuple[str, str]]] = {
 def format_notification(
     notification_type: str,
     event: str,
-    notification: UserNotificationEvent | AuxiliaryTeacherNotificationEvent | CourseNotificationEvent,
+    notification: UserNotificationEvent
+    | AuxiliaryTeacherNotificationEvent
+    | CourseNotificationEvent,
 ) -> Tuple[str, str]:
     """
     Devuelve (titulo, mensaje) listos para ser enviados.
