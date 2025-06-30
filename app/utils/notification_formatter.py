@@ -131,6 +131,18 @@ def format_update_aux_teacher(notificacion: AuxiliaryTeacherNotificationEvent):
         ),
     )
 
+def format_entrega_owner(notification: UserNotificationEvent):
+    fecha_formateada = formatear_fecha_legible(notification.data.fecha)
+
+    mensaje = (f"El usuario {notification.id_user} ha realizado una entrega de [{notification.notification_type}]: {notification.data.titulo}.")
+
+    if fecha_formateada:
+        mensaje += f"\nFecha: {fecha_formateada}"
+
+    return (
+        f"[{notification.notification_type}] {notification.data.titulo}",
+        mensaje,
+    )
 
 # Tabla de funciones por evento
 event_formatters: Dict[str, Callable[[Dict], Tuple[str, str]]] = {
@@ -141,6 +153,7 @@ event_formatters: Dict[str, Callable[[Dict], Tuple[str, str]]] = {
     "add": format_add_aux_teacher,
     "remove": format_remove_aux_teacher,
     "update": format_update_aux_teacher,
+    "EntregaOwner": format_entrega_owner,
 }
 
 

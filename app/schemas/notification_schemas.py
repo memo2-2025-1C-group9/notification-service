@@ -24,6 +24,7 @@ class UserNotificationEvent(BaseModel):
     id_user: int
     notification_type: Literal["Examen", "Tarea"]
     event: Literal["Entregado", "Calificado"]
+    assessment_owner_id: int | None = None
     data: NotificationEventData
 
     class Config:
